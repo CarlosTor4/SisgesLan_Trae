@@ -60,6 +60,35 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Documentação da Tela de Login (SisgesLan)
+
+- Visão geral: Tela de login construída com `React`, `shadcn-ui` e `Tailwind CSS`, com imagem de fundo e formulário centralizado.
+- Rotas de acesso:
+  - Aplicação React: `http://localhost:8080/login`
+  - Página estática: `public/login.html` servida em `http://localhost:8080/login.html`
+- Fluxo do processo de login:
+  - Compatibilidade: verifica suporte a `fetch` e `localStorage` para exibir alerta se necessário.
+  - Entrada: campos controlados de `Usuário` e `Senha` com validação obrigatória.
+  - Validação: considera login válido quando ambos os campos estão preenchidos.
+  - Sessão: persiste em `localStorage` com a chave `sisgeslan_session` e `isLoggedIn: true`.
+  - Navegação: redireciona para `/` após sucesso usando `useNavigate`.
+- Arquivos e recursos:
+  - Componente: `src/pages/Login.tsx`
+  - Página estática: `public/login.html`
+  - Assets: `src/assets/burger-hero.jpg` (fundo) e `src/assets/burger-icon.svg` (logo)
+  - Estilos base: `src/index.css` (variáveis e tema Tailwind)
+- Dependências visuais:
+  - Ícones: `lucide-react`
+  - Componentes UI: `shadcn-ui` (`Card`, `Input`, `Label`, `Button`)
+- Como executar:
+  - Iniciar servidor: `npm run dev`
+  - Abrir rota React: `http://localhost:8080/login`
+  - Abrir página estática: `http://localhost:8080/login.html`
+
+Observações:
+- A página `public/login.html` é estática e não executa a lógica de navegação do React; serve para documentação e referência visual.
+- A autenticação completa deve ser integrada a uma API futura; atualmente, o login usa verificação básica e `localStorage`.
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/2f757418-eae3-41ac-835e-65874bf94ce2) and click on Share -> Publish.

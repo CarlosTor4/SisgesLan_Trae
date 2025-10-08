@@ -1,8 +1,11 @@
+import { useEffect, useState } from "react";
+import { ChefHat, Calendar, Clock, Timer, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, Clock, CheckCircle, Timer } from "lucide-react";
-import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+import BurgerIcon from "@/assets/burger-icon.svg";
 
 export default function Cozinha() {
   const [pedidos, setPedidos] = useState([
@@ -37,6 +40,14 @@ export default function Cozinha() {
       horaFinalizacao: null
     },
   ]);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -74,31 +85,94 @@ export default function Cozinha() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-2 mb-6">
-        <ChefHat className="w-6 h-6 text-primary" />
-        <h1 className="text-2xl font-bold">Controle da Cozinha</h1>
+      <div className="flex flex-col mb-6">
+        <div className="flex items-center gap-2">
+          <img src={BurgerIcon} alt="Logo" className="w-8 h-8" />
+          <h1 className="text-2xl font-bold text-yellow-400">Burger & Cia</h1>
+        </div>
+        <div className="flex items-center gap-2 mt-2">
+          <ChefHat className="w-5 h-5 text-primary" />
+          <div>
+            <h2 className="text-lg font-semibold text-white">Controle da Cozinha</h2>
+            <p className="text-xs text-white/70">Gerencie os pedidos da cozinha</p>
+            <div className="flex items-center gap-2 text-white text-xs mt-2">
+              <Calendar className="w-3 h-3 text-primary" />
+              <span>{currentTime.toLocaleDateString()}</span>
+              <Clock className="w-3 h-3 text-primary" />
+              <span>{currentTime.toLocaleTimeString()}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {pedidos.map((pedido) => (
-          <Card key={pedido.id} className="border-l-4 border-l-primary">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Mesa {pedido.mesa}</CardTitle>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className={`${getStatusColor(pedido.status)} text-white`}>
-                    {getStatusText(pedido.status)}
-                  </Badge>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Clock className="w-4 h-4" />
-                    {pedido.tempo}
+          <Dialog key={pedido.id}>
+            <DialogTrigger asChild>
+              <Card className="border-l-4 border-l-primary cursor-pointer hover:bg-muted/50 transition-colors">
+                <CardHeader className="pb-3">
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex items-center gap-2">
+                      <img src={BurgerIcon} alt="Logo" className="w-6 h-6" />
+                      <h1 className="text-lg font-bold text-yellow-400">Burger & Cia</h1>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">Mesa {pedido.mesa}</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className={`${getStatusColor(pedido.status)} text-white`}>
+                          {getStatusText(pedido.status)}
+                        </Badge>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Clock className="w-4 h-4" />
+                          {pedido.tempo}
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-white/70">Pedido #{pedido.id} - {pedido.tempo}</p>
                   </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Horários do Pedido */}
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <p className="font-medium">Itens:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {pedido.itens.map((item, index) => (
+                        <Badge key={index} variant="secondary">{item}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </DialogTrigger>
+            <DialogContent className="bg-[#1e1e1e] text-white border-gray-700">
+              <DialogHeader>
+  <div className="flex flex-col gap-2">
+    <div className="flex justify-between items-start">
+      <div className="flex flex-col">
+        <div className="flex items-center gap-2">
+          <img src={BurgerIcon} alt="Logo Burger & Cia" className="w-10 h-10" />
+          <h1 className="text-2xl font-bold text-yellow-400">Burger & Cia</h1>
+        </div>
+        <div className="flex items-center gap-2 mt-2">
+          <ChefHat className="w-5 h-5 text-primary" />
+          <div>
+            <h2 className="text-lg font-semibold text-white">Detalhes do Pedido</h2>
+            <p className="text-xs text-white/70">Mesa {pedido.mesa} - Status: {getStatusText(pedido.status)}</p>
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 text-white">
+        <Calendar className="w-4 h-4 text-primary" />
+        <span>{currentTime.toLocaleDateString()}</span>
+        <Clock className="w-4 h-4 text-primary" />
+        <span>{currentTime.toLocaleTimeString()}</span>
+      </div>
+    </div>
+    <DialogTitle className="text-white text-lg font-semibold border-t border-border pt-2">
+      Mesa {pedido.mesa}
+    </DialogTitle>
+  </div>
+</DialogHeader>
+              <div className="space-y-4 py-4">
                 <div className="bg-muted/50 p-3 rounded-lg">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
                     <div className="flex items-center gap-1">
@@ -123,7 +197,6 @@ export default function Cozinha() {
                   </div>
                 </div>
 
-                {/* Itens do Pedido */}
                 <div>
                   <p className="font-medium mb-2">Itens do Pedido:</p>
                   <div className="space-y-2">
@@ -142,7 +215,6 @@ export default function Cozinha() {
                   </div>
                 </div>
                 
-                {/* Botões de Ação */}
                 <div className="flex gap-2">
                   {pedido.status === "pendente" && (
                     <Button 
@@ -169,8 +241,8 @@ export default function Cozinha() {
                   )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </DialogContent>
+          </Dialog>
         ))}
       </div>
 

@@ -1,0 +1,12 @@
+iD_colaborador,Código do colaborador,finçao,Data de Cadastro,Nome do colaborador,Rg,cpf,data de nascimento,e-mail,endereço,bairro,cidade,uf,login,senha
+1,101,vendedor,05/01/2024,Lucas Andrade,,,20/05/2005,,,,,,llucas ,123
+2,102,vendedor,12/01/2024,Mariana Costa,,,21/05/2005,,,,,,Mariana,123
+3,103,cozinheiro,20/01/2024,Rafael Lima,,,22/05/2005,,,,,,Rafael,123
+4,104,cozinheiro,28/01/2024,Camila Souza,,,23/05/2005,,,,,,Camila,123
+5,105,vendedor,03/02/2024,Bruno Ferreira,,,24/05/2005,,,,,,Bruno,123
+6,106,vendedor,10/02/2024,Juliana Mendes,,,25/05/2005,,,,,,Juliana,123
+7,107,vendedor,15/02/2024,Thiago Oliveira,,,26/05/2005,,,,,,Thiago,123
+8,108,vendedor,22/02/2024,Ana Beatriz Carvalho,,,27/05/2005,,,,,,Ana,123
+10,109,vendedor,29/02/2024,Pedro Henrique Barbosa,,,28/05/2005,,,,,,Pedro,123
+11,110,vendedor,05/03/2024,Fernanda Rodrigues,,,29/05/2005,,,,,,Fernanda,123
+12,999,administrador,01/01/2024,Carlos Torquato,,,30/05/2005,,,,,,admin,999

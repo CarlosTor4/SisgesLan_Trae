@@ -1,11 +1,15 @@
+import { useEffect, useState } from "react";
+import { Plus, Edit, Trash2, Image, ChefHat, Calendar, Clock, ShoppingCart, Timer, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ShoppingCart, Plus, Edit, Trash2, Clock } from "lucide-react";
-import { useState } from "react";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogClose, DialogTrigger } from "@/components/ui/dialog";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/lib/supabase";
+import BurgerIcon from "@/assets/burger-icon.svg";
 
 export default function Pedidos() {
   const [itensPedido, setItensPedido] = useState([
@@ -34,9 +38,16 @@ export default function Pedidos() {
   const [produto, setProduto] = useState("");
   const [quantidade, setQuantidade] = useState(1);
   const [preco, setPreco] = useState("");
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const totalPedido = itensPedido.reduce((sum, item) => sum + item.total, 0);
-  const horaPedido = new Date().toLocaleString();
 
   const adicionarItem = () => {
     if (produto && quantidade && preco) {
@@ -74,18 +85,103 @@ export default function Pedidos() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-2 mb-6">
-        <ShoppingCart className="w-6 h-6 text-primary" />
-        <h1 className="text-2xl font-bold">Lançamento de Pedidos</h1>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <img src={BurgerIcon} alt="Logo" className="w-8 h-8" />
+          <h1 className="text-2xl font-bold text-white">Burger & Cia</h1>
+        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Adicionar Item
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-[#1e1e1e] text-white border-gray-700">
+            <DialogHeader>
+  <div className="flex flex-col gap-2">
+    <div className="flex justify-between items-start">
+      <div className="flex flex-col">
+        <div className="flex items-center gap-2">
+          <ShoppingCart className="w-10 h-10 text-yellow-400" />
+          <h1 className="text-2xl font-bold text-yellow-400">Lançamento de Pedidos</h1>
+        </div>
+        <p className="text-sm text-white/70">Sistema de Controle de Pedidos</p>
+      </div>
+      <div className="flex items-center gap-2 text-white">
+        <Calendar className="w-4 h-4 text-primary" />
+        <span>{currentTime.toLocaleDateString()}</span>
+        <Clock className="w-4 h-4 text-primary" />
+        <span>{currentTime.toLocaleTimeString()}</span>
+      </div>
+    </div>
+    <DialogTitle className="text-white text-lg font-semibold border-t border-border pt-2">
+      Novo Pedido
+    </DialogTitle>
+  </div>
+</DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="produto">Produto</Label>
+                <Select value={produto} onValueChange={setProduto}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o produto" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="X-Bacon">X-Bacon</SelectItem>
+                    <SelectItem value="X-Burger">X-Burger</SelectItem>
+                    <SelectItem value="X-Salada">X-Salada</SelectItem>
+                    <SelectItem value="Coca-Cola">Coca-Cola</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="quantidade">Quantidade</Label>
+                  <Input 
+                    id="quantidade" 
+                    type="number" 
+                    placeholder="1" 
+                    value={quantidade}
+                    onChange={(e) => setQuantidade(Number(e.target.value))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="preco">Preço Unitário</Label>
+                  <Input 
+                    id="preco" 
+                    placeholder="R$ 0,00" 
+                    value={preco}
+                    onChange={(e) => setPreco(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button className="w-full" onClick={adicionarItem}>
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar Item
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Informações do Pedido */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="w-5 h-5" />
-            Informações do Pedido - {horaPedido}
-          </CardTitle>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <img src={BurgerIcon} alt="Logo" className="w-8 h-8" />
+              <h1 className="text-2xl font-bold text-yellow-400">Burger & Cia</h1>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <Clock className="w-5 h-5 text-primary" />
+              <div>
+                <h2 className="text-lg font-semibold text-white">Painel de Pedidos</h2>
+                <p className="text-xs text-white/70">{currentTime.toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -115,77 +211,71 @@ export default function Pedidos() {
         </CardContent>
       </Card>
 
-      {/* Formulário Novo Item com Resumo */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Adicionar Item ao Pedido</CardTitle>
-          <CardDescription>Mesa {mesa || "---"} | Garçom: {garcom || "Não selecionado"}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="produto">Produto</Label>
-            <Select value={produto} onValueChange={setProduto}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o produto" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="X-Bacon">X-Bacon</SelectItem>
-                <SelectItem value="X-Burger">X-Burger</SelectItem>
-                <SelectItem value="X-Salada">X-Salada</SelectItem>
-                <SelectItem value="Coca-Cola">Coca-Cola</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="quantidade">Quantidade</Label>
-              <Input 
-                id="quantidade" 
-                type="number" 
-                placeholder="1" 
-                value={quantidade}
-                onChange={(e) => setQuantidade(Number(e.target.value))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="preco">Preço Unitário</Label>
-              <Input 
-                id="preco" 
-                placeholder="R$ 0,00" 
-                value={preco}
-                onChange={(e) => setPreco(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <Button className="w-full" onClick={adicionarItem}>
-              <Plus className="w-4 h-4 mr-2" />
-              Adicionar Item
-            </Button>
-            
-            <div className="text-center p-2 bg-muted rounded-lg flex flex-col justify-center">
-              <p className="text-lg font-bold text-primary">R$ {totalPedido.toFixed(2)}</p>
-              <p className="text-xs text-muted-foreground">Total do Pedido</p>
-            </div>
-          </div>
-          
-          <Button className="w-full" disabled={itensPedido.length === 0}>
-            Finalizar Pedido Completo
-          </Button>
-        </CardContent>
-      </Card>
-
       {/* Lista de Itens do Pedido */}
       <Card>
         <CardHeader>
           <CardTitle>Itens do Pedido ({itensPedido.length})</CardTitle>
-          <CardDescription>Gerencie os itens adicionados ao pedido</CardDescription>
+          <CardDescription>Mesa {mesa || "---"} | Garçom: {garcom || "Não selecionado"} | Total: R$ {totalPedido.toFixed(2)}</CardDescription>
         </CardHeader>
         <CardContent>
           {itensPedido.length > 0 ? (
-            <Table>
+            <div className="md:hidden">
+              {itensPedido.map((item) => (
+                <Card key={item.id} className="mb-4">
+                  <CardContent className="p-4 grid gap-4">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold text-lg">{item.produto}</span>
+                      <span className={`px-2 py-1 rounded-full text-xs ${item.status === 'finalizado' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                        {item.status === 'finalizado' ? 'Finalizado' : 'Pendente'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Quantidade:</span>
+                      <span>{item.quantidade}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Preço Unit.:</span>
+                      <span>R$ {item.precoUnitario.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm font-semibold">
+                      <span className="text-muted-foreground">Total:</span>
+                      <span>R$ {item.total.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-muted-foreground border-t pt-2 mt-2">
+                      <span>{item.horaAdicao}</span>
+                    </div>
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => finalizarItemPedido(item.id)}
+                        disabled={item.status === 'finalizado'}
+                      >
+                        Finalizar
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => editarItem(item.id)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => excluirItem(item.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : null}
+          {itensPedido.length > 0 ? (
+            <Table className="hidden md:table">
               <TableHeader>
                 <TableRow>
                   <TableHead>Produto</TableHead>
@@ -199,7 +289,7 @@ export default function Pedidos() {
               </TableHeader>
               <TableBody>
                 {itensPedido.map((item) => (
-                  <TableRow key={item.id}>
+                  <TableRow key={item.id} className="text-white">
                     <TableCell className="font-medium">{item.produto}</TableCell>
                     <TableCell>{item.quantidade}</TableCell>
                     <TableCell>R$ {item.precoUnitario.toFixed(2)}</TableCell>
@@ -252,6 +342,12 @@ export default function Pedidos() {
           )}
         </CardContent>
       </Card>
+
+      <div className="flex justify-end">
+        <Button className="w-full sm:w-auto" disabled={itensPedido.length === 0}>
+          Finalizar Pedido Completo
+        </Button>
+      </div>
     </div>
   );
 }
